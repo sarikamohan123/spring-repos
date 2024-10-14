@@ -1,0 +1,5 @@
+package com.prs.model;
+
+public class Product {
+
+}

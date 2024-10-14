@@ -1,0 +1,10 @@
+package com.bmdb.model;
+
+public class Movie {
+	private int id;
+	private String title;
+	private int year;
+	private String rating;
+	private String director;
+
+}

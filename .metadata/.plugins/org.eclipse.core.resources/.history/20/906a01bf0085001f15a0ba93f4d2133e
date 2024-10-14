@@ -1,0 +1,43 @@
+package com.movie.model;
+
+import java.sql.Date;
+
+public class Actor {
+
+	private int id;
+	private String firstName;
+	private String lastName;
+	private String gender;
+	private Date birthdate;
+	
+	//Fully Loaded Constructor
+	
+	public Actor(int id, String firstName, String lastName, String gender, Date birthdate) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.gender = gender;
+		this.birthdate = birthdate;
+	}
+
+
+//Default Constructor
+	public Actor() {
+		super();
+		
+		
+	}
+
+
+//ToString method
+	@Override
+	public String toString() {
+		return "Actor [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", gender=" + gender
+				+ ", birthdate=" + birthdate + "]";
+	}
+	
+	
+	
+	
+}

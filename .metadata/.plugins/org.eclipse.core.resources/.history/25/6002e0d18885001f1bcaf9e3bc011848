@@ -1,0 +1,5 @@
+package com.bmdb.db;
+
+public interface MovieRepo {
+
+}

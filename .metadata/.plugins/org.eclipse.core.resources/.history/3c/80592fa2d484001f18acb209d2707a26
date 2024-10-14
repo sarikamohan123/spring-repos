@@ -1,0 +1,38 @@
+package com.hobby.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class HobbyController {
+	
+	/*
+	 * 
+	 */
+
+	private static List<String> hobbies = new ArrayList<>();
+	public List<String> getAll(){
+		return hobbies;
+	}
+	
+	public static List<String> get(int idx){
+		return hobbies;
+	}
+	
+	public String add (String hobby) {
+		if(hobbies.indexOf(hobby) >=0) {
+			return "Hobby already exists";
+		}
+		else {
+			hobbies.add(hobby);
+			return "Hobby added";
+		}
+	}
+	public String update(String hobby ,int idx) {
+		hobbies.set(idx,hobby);
+		return "Hobby updated";
+	}
+	public String delete(int idx) {
+		hobbies.remove(idx);
+		return "Hobby removed";
+	}
+}

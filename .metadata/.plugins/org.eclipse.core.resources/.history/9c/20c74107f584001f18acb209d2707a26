@@ -1,0 +1,48 @@
+package com.movie.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.movie.model.Movie;
+
+@RestController
+@RequestMapping("/api/movies")
+public class MovieController {
+	
+	private static List<String> movies = new ArrayList<>();
+	@GetMapping("/")
+	public List<String> getAll(){
+		return movies;
+	}
+	
+	@GetMapping("/{idx}")
+	public String get(@PathVariable int idx){
+		return movies.get(idx);
+	}
+	
+@PostMapping("")
+	
+	public Movie add(@RequestBody Movie movie) {
+		if(movies.indexOf(movie) >=0) {
+			return "movie already exists";
+		}
+		else {
+			movies.add(movie);
+			return "Movie added";
+		}
+	}
+@PutMapping("/{idx}/{movie}")
+public String update(@PathVariable String movie ,@PathVariable int idx) {
+	movies.set(idx,movie);
+	return "movie updated";
+
+}
+}

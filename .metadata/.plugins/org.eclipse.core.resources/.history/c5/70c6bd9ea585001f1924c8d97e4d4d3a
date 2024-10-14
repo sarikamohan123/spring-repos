@@ -1,0 +1,5 @@
+package com.bmdb.model;
+
+public class Credit {
+
+}

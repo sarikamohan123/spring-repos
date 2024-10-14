@@ -1,0 +1,32 @@
+package com.movie.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.movie.model.Actor;
+import com.movie.model.Movie;
+
+public class ActorController {
+	
+	private static List<Actor> actors = new ArrayList<>();
+	
+	// Get all Actors
+		@GetMapping("/")
+		public List<Actor> getAll() {
+			return actors;
+		}
+		
+		
+		public String getActor(@PathVariable int id) {
+			for(Actor actor :actors) {
+				if (actor.getId() == id) {
+					return actor.toString();
+				}
+			}
+			return "Actor not found";
+		}
+			
+}

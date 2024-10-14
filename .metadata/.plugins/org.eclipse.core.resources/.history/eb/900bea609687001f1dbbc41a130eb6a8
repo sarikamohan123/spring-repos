@@ -1,0 +1,158 @@
+package com.prs.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.prs.db.LineItemRepo;
+import com.prs.db.RequestRepo;
+import com.prs.model.LineItem;
+
+@RestController
+@RequestMapping("/api/LineItems")
+public class LineItemController {
+	@Autowired
+	private LineItemRepo lineItemRepo;
+
+	@Autowired
+	private RequestRepo requestRepo;
+
+	// Get all LineItems
+	@GetMapping("/")
+	public List<LineItem> getAllLineItem() {
+		return lineItemRepo.findAll();
+	}
+
+	// GetById
+	@GetMapping("/{id}")
+	public Optional<LineItem> getLineItemById(@PathVariable int id) {
+
+		Optional<LineItem> l = lineItemRepo.findById(id);
+		if (l.isPresent())
+			return l;
+		else
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lineitem not found for id: " + id);
+
+	}
+
+	
+	  @PostMapping("")
+	  
+	  public LineItem addLineItem(@RequestBody LineItem lineItem) {
+	  
+	  LineItem savedLineItem = lineItemRepo.save(lineItem);
+	  
+	  int requestId = savedLineItem.getRequest().getId();
+	  
+	  return recalculateRequestTotal(requestId, savedLineItem); }
+	 
+	/*
+	 * public LineItem addLineItem(@RequestBody LineItem lineItem) { Request r =
+	 * lineItem.getRequest(); return lineItemRepo.save(lineItem); }
+	 */
+
+	/*
+	 * //Post : api/LineItems
+	 * 
+	 * @PostMapping("") public ResponseEntity<LineItem> addLineItem(@RequestBody
+	 * LineItem lineItem){ //Save the new LineItem LineItem savedLineItem
+	 * =lineItemRepo.save(lineItem);
+	 * 
+	 * //recalculate the total for the associated request
+	 * recalculateRequestTotal(savedLineItem.getRequest().getId()); return
+	 * ResponseEntity.created(null).body(savedLineItem);
+	 * 
+	 * 
+	 * }
+	 */
+
+	// Method to recalculate the total cost for the associated request
+	private LineItem recalculateRequestTotal(int requestId, LineItem newLineItem) {
+		// Get the request and include its line items
+		var requestOptional = requestRepo.findById(requestId);
+		System.out.println(requestOptional);
+		if (requestOptional.isPresent()) {
+			var request = requestOptional.get();
+			
+			Double total  = 0.0;
+
+			// Find all the line items by requestId and Calculate the total
+			List<LineItem> lineItems = lineItemRepo.findByRequestId(requestId);
+			for (LineItem item : lineItems) {
+				
+				// Add the Product of quantity and price to total
+				int newQuantity = newLineItem.getQuantity();
+
+				Double newPrice = newLineItem.getProduct().getPrice();
+
+				total += newQuantity * newPrice; // Add new item directly
+
+
+				
+				/*
+				 * int quantity = item.getQuantity(); Double price =
+				 * item.getProduct().getPrice(); total += quantity * price;
+				 */
+				//total = total.add(quantity.multiply(price));
+
+			}
+
+			// Set the new Calculated total to th request
+			request.setTotal(total);
+
+			// save the updated request with the new total
+			requestRepo.save(request);
+			return lineItems.get(0);
+		}
+		return null;
+	}
+
+	// put -
+	@PutMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void putLineItem(@PathVariable int id, @RequestBody LineItem lineItem) {
+
+		if (id != lineItem.getId()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "LineItem id mismatch vs url");
+		}
+		// If LineItem exists ,update,else not found
+
+		else if (lineItemRepo.existsById(lineItem.getId())) {
+			lineItemRepo.save(lineItem);
+		} else {
+
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "LineItem id mismatch vs URL");
+
+		}
+	}
+
+	// delete
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteLineItem(@PathVariable int id) {
+		if (lineItemRepo.existsById(id)) {
+			lineItemRepo.deleteById(id);
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "LineItem not found for id: " + id);
+		}
+
+	}
+
+	// Get LineItems by requestId
+	@GetMapping("/lines-for-req/{requestId}")
+	public List<LineItem> getLineItemsForRequestId(@PathVariable int requestId) {
+		return lineItemRepo.findByRequestId(requestId);
+	}
+}
